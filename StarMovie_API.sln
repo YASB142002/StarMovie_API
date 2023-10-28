@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarMovie_API", "StarMovie_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarMovie_API_Models", "StarMovie_API_Models\StarMovie_API_Models.csproj", "{C2AF2864-8B13-46D9-A4BE-1737786E4B4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarMovie_API_Data", "StarMovie_API_Data\StarMovie_API_Data.csproj", "{6233796F-81DA-4BA6-BDEA-5D03EAA3701E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C2AF2864-8B13-46D9-A4BE-1737786E4B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2AF2864-8B13-46D9-A4BE-1737786E4B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2AF2864-8B13-46D9-A4BE-1737786E4B4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6233796F-81DA-4BA6-BDEA-5D03EAA3701E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6233796F-81DA-4BA6-BDEA-5D03EAA3701E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6233796F-81DA-4BA6-BDEA-5D03EAA3701E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6233796F-81DA-4BA6-BDEA-5D03EAA3701E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
