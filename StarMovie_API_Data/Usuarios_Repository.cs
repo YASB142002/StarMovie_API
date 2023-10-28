@@ -1,4 +1,5 @@
 ﻿using StarMovie_API_Data.Repository;
+using StarMovie_API_Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,17 +15,17 @@ namespace StarMovie_API_Data
             throw new NotImplementedException();
         }
 
-        public Task<Usuarios_Repository> GetUsers(int id)
+        public Task<Usuarios> GetUsers(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> InsertUser(Usuarios_Repository usuario)
+        public Task<bool> InsertUser(Usuarios usuario)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateUser(Usuarios_Repository usuario)
+        public Task<bool> UpdateUser(Usuarios usuario)
         {
             throw new NotImplementedException();
         }

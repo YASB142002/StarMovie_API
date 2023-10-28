@@ -9,9 +9,9 @@ namespace StarMovie_API_Data.Repository
 {
     public interface IUsuarios
     {
-        Task<Usuarios_Repository> GetUsers(int id);
-        Task<bool> InsertUser(Usuarios_Repository usuario);
-        Task<bool> UpdateUser(Usuarios_Repository usuario);
+        Task<Usuarios> GetUsers(int id);
+        Task<bool> InsertUser(Usuarios usuario);
+        Task<bool> UpdateUser(Usuarios usuario);
         Task<bool> DeleteUser(int id);
     }
 }
