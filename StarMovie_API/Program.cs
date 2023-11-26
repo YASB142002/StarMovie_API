@@ -1,3 +1,6 @@
+using StarMovie_API_Data;
+using StarMovie_API_Data.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,7 +10,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Este seria para mandar a llamar una connection cada vez que se manda a llamar el singleton
+
+var mySQLConfiguration = new MySQLConfiguration(builder.Configuration.GetConnectionString("MySqlConnection"));
+builder.Services.AddSingleton(mySQLConfiguration);
+
+//Este seria para mandar a llamar una nueva connection cada consulta
+//builder.Services.AddSingleton(new MySqlConnection(builder.Configuration.GetConnectionString("MySqlConnection")));
+
+builder.Services.AddScoped<IUsuariosRepository, Usuarios_Repository>();
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

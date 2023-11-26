@@ -8,7 +8,7 @@ namespace StarMovie_API_Models
 {
     public class CatgPeli
     {
-        public string NombreCatg { get; set; }
-        public string DescPeli { get; set;}
+        public string NombreCatg {  get; set; }
+        public string DescPeli { get; set; }
     }
 }

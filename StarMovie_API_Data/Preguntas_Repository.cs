@@ -1,20 +1,23 @@
 ﻿using Dapper;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Asn1.IsisMtt.X509;
 using StarMovie_API_Data.Repository;
 using StarMovie_API_Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace StarMovie_API_Data
 {
-    public class Votos_Repository : IVotosRepository
+    public class Preguntas_Repository : IPreguntasRepository
     {
         private readonly MySQLConfiguration _connectionString;
-        public Votos_Repository(MySQLConfiguration connectionString)
+        public Preguntas_Repository(MySQLConfiguration connectionString)
         {
             _connectionString = connectionString;
         }
@@ -22,16 +25,52 @@ namespace StarMovie_API_Data
         {
             return new MySqlConnection(_connectionString.ConnectionString);
         }
-        public async Task<bool> DeleteVoto(int id)
+        public async Task<bool> DeletePregunta(int id)
         {
             try
             {
                 var data = new DataSet();
-                using (var cmd = new MySqlCommand("dltvotos", dbConnection()))
+                using (var cmd = new MySqlCommand("dltCatgpeli", dbConnection()))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@idv", id);
+                    cmd.Parameters.AddWithValue("@Ncatg", id);
+
+                    using (var adapt = new MySqlDataAdapter(cmd))
+                    {
+                        await adapt.FillAsync(data);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex) { return false; }
+
+        }
+
+        public async Task<IEnumerable<Preguntas>> GetAllPreguntas()
+        {
+            var db = dbConnection();
+            var sql = $@"SELECT * FROM preguntas";
+            return await db.QueryAsync<Preguntas>(sql);
+        }
+
+        public async Task<Preguntas> GetPregunta(int id)
+        {
+            var db = dbConnection();
+            var sql = $@"SELECT * FROM preguntas WHERE idpregunta = {id}";
+            return await db.QueryFirstOrDefaultAsync<Preguntas>(sql);
+        }
+
+        public async Task<bool> InsertPregunta(Preguntas preguntas)
+        {
+            try
+            {
+                var data = new DataSet();
+                using (var cmd = new MySqlCommand("NPreguntas", dbConnection()))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@intg", preguntas.Interrogante.Trim());
 
                     using (var adapt = new MySqlDataAdapter(cmd))
                     {
@@ -43,68 +82,17 @@ namespace StarMovie_API_Data
             catch (Exception ex) { return false; }
         }
 
-        public async Task<IEnumerable<Votos>> GetAllVotos()
+        public async Task<bool> UpdatePregunta(Preguntas preguntas)
         {
-            var db = dbConnection();
-
-            var sql = @"SELECT *
-                        FROM votos";
-
-            return await db.QueryAsync<Votos>(sql);
-        }
-
-        public async Task<Votos> GetVotosDetails(int id)
-        {
-            var db = dbConnection();
-
-            var sql = @"SELECT *
-                        FROM votos 
-                        WHERE idvotos = " + id.ToString();
-
-            return await db.QueryFirstOrDefaultAsync<Votos>(sql);
-        }
-
-        public async Task<bool> InsertVoto(Votos votos)
-        {
-            var db = dbConnection();
-
-            var sql = $@"call Nvotos ('{votos.User_Name}',{votos.Id_Pelicula},{votos.Points},'{votos.Comentario}');";
             try
             {
                 var data = new DataSet();
-                using (var cmd = new MySqlCommand("Nvotos", dbConnection()))
+                using (var cmd = new MySqlCommand("editpreguntas", dbConnection()))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@usn", votos.User_Name.Trim());
-                    cmd.Parameters.AddWithValue("@IDP", votos.Id_Pelicula);
-                    cmd.Parameters.AddWithValue("@puntos", votos.Points);
-                    cmd.Parameters.AddWithValue("@comen", votos.Comentario);
-
-                    using (var adapt = new MySqlDataAdapter(cmd))
-                    {
-                        await adapt.FillAsync(data);
-                        return true;
-                    }
-                }
-            }
-            catch (Exception ex) { return false; }
-        }
-
-        public async Task<bool> UpdateVoto(Votos votos)
-        {
-            var db = dbConnection();
-            var sql = $@"call editvotos({votos.Id_Votos}, {votos.Points},'{votos.Comentario}');";
-            try
-            {
-                var data = new DataSet();
-                using (var cmd = new MySqlCommand("editvotos", dbConnection()))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@idv", votos.Id_Votos);
-                    cmd.Parameters.AddWithValue("@nuevospuntos", votos.Points);
-                    cmd.Parameters.AddWithValue("@ncoment", votos.Comentario.Trim());
+                    cmd.Parameters.AddWithValue("@idp", preguntas.Id_Pregunta);
+                    cmd.Parameters.AddWithValue("@npregunta", preguntas.Interrogante.Trim());
 
                     using (var adapt = new MySqlDataAdapter(cmd))
                     {

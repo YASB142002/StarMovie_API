@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace StarMovie_API_Data
 {
-    public class Votos_Repository : IVotosRepository
+    public class CatgPeli_Repository : ICatgPeliRepository
     {
         private readonly MySQLConfiguration _connectionString;
-        public Votos_Repository(MySQLConfiguration connectionString)
+        public CatgPeli_Repository(MySQLConfiguration connectionString)
         {
             _connectionString = connectionString;
         }
@@ -22,16 +22,16 @@ namespace StarMovie_API_Data
         {
             return new MySqlConnection(_connectionString.ConnectionString);
         }
-        public async Task<bool> DeleteVoto(int id)
+        public async Task<bool> DeleteCatgPeli(string id)
         {
             try
             {
                 var data = new DataSet();
-                using (var cmd = new MySqlCommand("dltvotos", dbConnection()))
+                using (var cmd = new MySqlCommand("dltCatgpeli", dbConnection()))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@idv", id);
+                    cmd.Parameters.AddWithValue("@Ncatg", id.Trim());
 
                     using (var adapt = new MySqlDataAdapter(cmd))
                     {
@@ -43,43 +43,31 @@ namespace StarMovie_API_Data
             catch (Exception ex) { return false; }
         }
 
-        public async Task<IEnumerable<Votos>> GetAllVotos()
+        public async Task<IEnumerable<CatgPeli>> GetAllCatgPelis()
         {
             var db = dbConnection();
-
-            var sql = @"SELECT *
-                        FROM votos";
-
-            return await db.QueryAsync<Votos>(sql);
+            var sql = $@"SELECT * FROM catgpeli";
+            return await db.QueryAsync<CatgPeli>(sql);
         }
 
-        public async Task<Votos> GetVotosDetails(int id)
+        public async Task<CatgPeli> GetCatgPeli(string id)
         {
             var db = dbConnection();
-
-            var sql = @"SELECT *
-                        FROM votos 
-                        WHERE idvotos = " + id.ToString();
-
-            return await db.QueryFirstOrDefaultAsync<Votos>(sql);
+            var sql = $@"SELECT * FROM catgpeli WHERE NombreCatg = {id}";
+            return await db.QueryFirstOrDefaultAsync<CatgPeli>(sql);
         }
 
-        public async Task<bool> InsertVoto(Votos votos)
+        public async Task<bool> InsertCatgPeli(CatgPeli catgPeli)
         {
-            var db = dbConnection();
-
-            var sql = $@"call Nvotos ('{votos.User_Name}',{votos.Id_Pelicula},{votos.Points},'{votos.Comentario}');";
             try
             {
                 var data = new DataSet();
-                using (var cmd = new MySqlCommand("Nvotos", dbConnection()))
+                using (var cmd = new MySqlCommand("NCatgPeli", dbConnection()))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@usn", votos.User_Name.Trim());
-                    cmd.Parameters.AddWithValue("@IDP", votos.Id_Pelicula);
-                    cmd.Parameters.AddWithValue("@puntos", votos.Points);
-                    cmd.Parameters.AddWithValue("@comen", votos.Comentario);
+                    cmd.Parameters.AddWithValue("@Namecatg", catgPeli.NombreCatg.Trim());
+                    cmd.Parameters.AddWithValue("@DescP", catgPeli.DescPeli.Trim());
 
                     using (var adapt = new MySqlDataAdapter(cmd))
                     {
@@ -91,20 +79,21 @@ namespace StarMovie_API_Data
             catch (Exception ex) { return false; }
         }
 
-        public async Task<bool> UpdateVoto(Votos votos)
+        public async Task<bool> UpdateCatgPeli(string oldcatname, CatgPeli catgPeli)
         {
             var db = dbConnection();
-            var sql = $@"call editvotos({votos.Id_Votos}, {votos.Points},'{votos.Comentario}');";
+            //Hay que validar en el procedimiento de almacenado el nombre de categoria nuevo porque no puede ser null ya que la llave primaria jamas puede ser null
+            var sql = $@"call editcatg('{oldcatname}', '{catgPeli.NombreCatg}', '{catgPeli.DescPeli}');";
             try
             {
                 var data = new DataSet();
-                using (var cmd = new MySqlCommand("editvotos", dbConnection()))
+                using (var cmd = new MySqlCommand("editcatg", dbConnection()))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@idv", votos.Id_Votos);
-                    cmd.Parameters.AddWithValue("@nuevospuntos", votos.Points);
-                    cmd.Parameters.AddWithValue("@ncoment", votos.Comentario.Trim());
+                    cmd.Parameters.AddWithValue("@catg", oldcatname.Trim());
+                    cmd.Parameters.AddWithValue("@nuevocatg", catgPeli.NombreCatg.Trim());
+                    cmd.Parameters.AddWithValue("@ndescpeli", catgPeli.DescPeli.Trim());
 
                     using (var adapt = new MySqlDataAdapter(cmd))
                     {

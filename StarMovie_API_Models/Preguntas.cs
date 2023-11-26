@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace StarMovie_API_Models
 {
-    public class Premiacion
+    public class Preguntas
     {
-        public string Premio {  get; set; }
-        public int Id_Actor { get; set; }
-        public DateOnly Fecha { get; set; }
+        public int Id_Pregunta { get; set; }
+        public string Interrogante { get; set; }
     }
 }
