@@ -8,8 +8,11 @@ namespace StarMovie_API_Models
 {
     public class Votos
     {
-        public string user_name {  get; set; }
+        public int Id_Votos { get; set; }
+        public string User_Name { get; set; }
         public int Id_Pelicula { get; set; }
-        public double points { get; set; }
+        public double Points { get; set; }
+        public DateTime Fecha { get; set; }
+        public string Comentario { get; set; }
     }
 }

@@ -1,19 +1,22 @@
 ﻿using Dapper;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Asn1.IsisMtt.X509;
 using StarMovie_API_Data.Repository;
 using StarMovie_API_Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace StarMovie_API_Data
 {
-    public class Votos_Repository : IVotosRepository
+    public class Preguntas_Repository : IPreguntasRepository
     {
         private readonly MySQLConfiguration _connectionString;
-        public Votos_Repository(MySQLConfiguration connectionString)
+        public Preguntas_Repository(MySQLConfiguration connectionString)
         {
             _connectionString = connectionString;
         }
@@ -21,50 +24,40 @@ namespace StarMovie_API_Data
         {
             return new MySqlConnection(_connectionString.ConnectionString);
         }
-        public async Task<bool> DeleteVoto(int id)
+        public async Task<bool> DeletePregunta(int id)
         {
             var db = dbConnection();
-            var sql = @"call dltvotos(" + id + ");";
+            var sql = $@"call dltCatgpeli('{id}');";
             var result = await db.ExecuteAsync(sql);
             return result > 0;
         }
 
-        public async Task<IEnumerable<Votos>> GetAllVotos()
+        public async Task<IEnumerable<Preguntas>> GetAllPreguntas()
         {
             var db = dbConnection();
-
-            var sql = @"SELECT *
-                        FROM votos";
-
-            return await db.QueryAsync<Votos>(sql);
+            var sql = $@"SELECT * FROM preguntas";
+            return await db.QueryAsync<Preguntas>(sql);
         }
 
-        public async Task<Votos> GetVotosDetails(int id)
+        public async Task<Preguntas> GetPregunta(int id)
         {
             var db = dbConnection();
-
-            var sql = @"SELECT *
-                        FROM votos 
-                        WHERE idvotos = " + id.ToString();
-
-            return await db.QueryFirstOrDefaultAsync<Votos>(sql);
+            var sql = $@"SELECT * FROM preguntas WHERE idpregunta = {id}";
+            return await db.QueryFirstOrDefaultAsync<Preguntas>(sql);
         }
 
-        public async Task<bool> InsertVoto(Votos votos)
+        public async Task<bool> InsertPregunta(Preguntas preguntas)
         {
             var db = dbConnection();
-
-            var sql = $@"call Nvotos ('{votos.User_Name}',{votos.Id_Pelicula},{votos.Points},'{votos.Comentario}');";
-
+            var sql = $@"call NPreguntas ('{preguntas.Interrogante}');";
             var result = await db.ExecuteAsync(sql);
-
             return result > 0;
         }
 
-        public async Task<bool> UpdateVoto(Votos votos)
+        public async Task<bool> UpdatePregunta(Preguntas preguntas)
         {
             var db = dbConnection();
-            var sql = $@"call editvotos({votos.Id_Votos}, {votos.Points},'{votos.Comentario}');";
+            var sql = $@"call editpreguntas({preguntas.Id_Pregunta},'{preguntas.Interrogante}');";
             var result = await db.ExecuteAsync(sql);
             return result > 0;
         }
