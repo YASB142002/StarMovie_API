@@ -57,7 +57,7 @@ namespace StarMovie_API_Data
         public async Task<bool> UpdateUsuario(string oldusername, Usuarios newuser )
         {
             var db = dbConnection();
-            //El metodo de almacenado de la base de datos pide 2 nuevos username para actualizar (el antiguo y el nuevo)
+            {
             var sql = $@"call edituser ('{oldusername}', '{newuser.Username}', '{newuser.password}', '{newuser.mail}');";
             var result = await db.ExecuteAsync(sql);
             return result > 0;
