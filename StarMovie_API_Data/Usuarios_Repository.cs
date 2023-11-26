@@ -4,6 +4,7 @@ using StarMovie_API_Data.Repository;
 using StarMovie_API_Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -24,10 +25,23 @@ namespace StarMovie_API_Data
         }
         public async Task<bool> DeleteUsuario(string username)
         {
-            var db = dbConnection();
-            var sql = $@"call dltUsuario ('{username}');";
-            var result = await db.ExecuteAsync(sql);
-            return result > 0;
+            try
+            {
+                var data = new DataSet();
+                using (var cmd = new MySqlCommand("dltUsuario", dbConnection()))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@usern", username.Trim());
+
+                    using (var adapt = new MySqlDataAdapter(cmd))
+                    {
+                        await adapt.FillAsync(data);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex) { return false; }
         }
 
         public async Task<IEnumerable<Usuarios>> GetAllUsuarios()
@@ -48,20 +62,55 @@ namespace StarMovie_API_Data
 
         public async Task<bool> InsertUsuario(Usuarios usuario)
         {
-            var db = dbConnection();
-            var sql = $@"call Nusuario('{usuario.Username}','{usuario.Pnombre}','{usuario.Snombre}','{usuario.PApellido}','{usuario.SApellido}','{usuario.fnacimiento}','{usuario.password}','{usuario.mail}');";
-            var result = await db.ExecuteAsync(sql);
-            return result > 0;
+            try
+            {
+                var data = new DataSet();
+                using (var cmd = new MySqlCommand("Nusuario", dbConnection()))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@usname", usuario.Username.Trim());
+                    cmd.Parameters.AddWithValue("@Pname", usuario.Pnombre.Trim());
+                    cmd.Parameters.AddWithValue("@Sname", usuario.Snombre.Trim());
+                    cmd.Parameters.AddWithValue("@PA", usuario.PApellido.Trim());
+                    cmd.Parameters.AddWithValue("@SA", usuario.SApellido.Trim());
+                    cmd.Parameters.AddWithValue("@FNac", usuario.fnacimiento);
+                    cmd.Parameters.AddWithValue("@Psword", usuario.password.Trim());
+                    cmd.Parameters.AddWithValue("@mail", usuario.mail.Trim());
+
+                    using (var adapt = new MySqlDataAdapter(cmd))
+                    {
+                        await adapt.FillAsync(data);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex) { return false; }
         }
 
         public async Task<bool> UpdateUsuario(string oldusername, Usuarios newuser )
         {
-            var db = dbConnection();
+            try
             {
-            var sql = $@"call edituser ('{oldusername}', '{newuser.Username}', '{newuser.password}', '{newuser.mail}');";
-            var result = await db.ExecuteAsync(sql);
-            return result > 0;
+                //El metodo de almacenado para editar el username de un usuario no deberia pedir para editar el username ya que seria el identificador
+                var data = new DataSet();
+                using (var cmd = new MySqlCommand("edituser", dbConnection()))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
 
+                    cmd.Parameters.AddWithValue("@usern", oldusername.Trim());
+                    cmd.Parameters.AddWithValue("@nuevouser", newuser.Username.Trim());
+                    cmd.Parameters.AddWithValue("@npssword", newuser.password.Trim());
+                    cmd.Parameters.AddWithValue("@nmail", newuser.mail.Trim());
+
+                    using (var adapt = new MySqlDataAdapter(cmd))
+                    {
+                        await adapt.FillAsync(data);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex) { return false; }
         }
     }
 }

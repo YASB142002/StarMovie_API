@@ -5,6 +5,7 @@ using StarMovie_API_Data.Repository;
 using StarMovie_API_Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.WebSockets;
@@ -26,10 +27,24 @@ namespace StarMovie_API_Data
         }
         public async Task<bool> DeletePregunta(int id)
         {
-            var db = dbConnection();
-            var sql = $@"call dltCatgpeli('{id}');";
-            var result = await db.ExecuteAsync(sql);
-            return result > 0;
+            try
+            {
+                var data = new DataSet();
+                using (var cmd = new MySqlCommand("dltCatgpeli", dbConnection()))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@Ncatg", id);
+
+                    using (var adapt = new MySqlDataAdapter(cmd))
+                    {
+                        await adapt.FillAsync(data);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex) { return false; }
+
         }
 
         public async Task<IEnumerable<Preguntas>> GetAllPreguntas()
@@ -48,18 +63,45 @@ namespace StarMovie_API_Data
 
         public async Task<bool> InsertPregunta(Preguntas preguntas)
         {
-            var db = dbConnection();
-            var sql = $@"call NPreguntas ('{preguntas.Interrogante}');";
-            var result = await db.ExecuteAsync(sql);
-            return result > 0;
+            try
+            {
+                var data = new DataSet();
+                using (var cmd = new MySqlCommand("NPreguntas", dbConnection()))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@intg", preguntas.Interrogante.Trim());
+
+                    using (var adapt = new MySqlDataAdapter(cmd))
+                    {
+                        await adapt.FillAsync(data);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex) { return false; }
         }
 
         public async Task<bool> UpdatePregunta(Preguntas preguntas)
         {
-            var db = dbConnection();
-            var sql = $@"call editpreguntas({preguntas.Id_Pregunta},'{preguntas.Interrogante}');";
-            var result = await db.ExecuteAsync(sql);
-            return result > 0;
+            try
+            {
+                var data = new DataSet();
+                using (var cmd = new MySqlCommand("editpreguntas", dbConnection()))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@idp", preguntas.Id_Pregunta);
+                    cmd.Parameters.AddWithValue("@npregunta", preguntas.Interrogante.Trim());
+
+                    using (var adapt = new MySqlDataAdapter(cmd))
+                    {
+                        await adapt.FillAsync(data);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex) { return false; }
         }
     }
 }

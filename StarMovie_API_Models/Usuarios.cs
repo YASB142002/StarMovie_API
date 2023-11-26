@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -14,13 +15,14 @@ namespace StarMovie_API_Models
         public string Snombre { get; set; }
         public string PApellido { get; set; }
         public string SApellido { get; set; }
+        private DateTime Fnacimiento;
         public DateTime fnacimiento 
         {
-            get => fnacimiento;
+            get => Fnacimiento;
             set
             {
-                Thread.CurrentThread.CurrentCulture = new CultureInfo("nl-NL");
-                fnacimiento = value;
+                var date = value.Date;
+                Fnacimiento = date;
             }
         }
         public string password { get; set; }

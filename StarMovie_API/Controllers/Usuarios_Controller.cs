@@ -50,7 +50,7 @@ namespace StarMovie_API.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteUser(string Username)
         {
-            if (!string.IsNullOrEmpty(Username))
+            if (string.IsNullOrEmpty(Username))
                 return BadRequest("No puede ser null el username.");
             await _UsuarioRepository.DeleteUsuario(Username);
             return NoContent();
